@@ -1,6 +1,8 @@
+import os
 from flask import Flask, url_for, request
 
 app = Flask(__name__)
+app.config['UPLOAD_FOLDER'] = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'static/media')
 
 
 @app.route('/')
@@ -248,6 +250,51 @@ def carousel():
                                 <span class="sr-only">Next</span>
                             </a>
                         </div>
+                    </body>
+                    </html>"""
+
+
+@app.route('/load_photo', methods=['GET', 'POST'])
+def load_photo():
+    photo = ''
+
+    if request.method == 'POST':
+        file = request.files['photo']
+        if file:
+            filename = file.filename
+            file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+            photo = f"""<img src="{url_for('static', filename='media/' + filename)}" class="img-fluid">"""
+
+    return f"""<!doctype html>
+                    <html lang="en">
+                      <head>
+                        <meta charset="utf-8">
+                        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+                         <link rel="stylesheet"
+                         href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/css/bootstrap.min.css"
+                         integrity="sha384-giJF6kkoqNQ00vy+HMDP7azOuL0xtbfIcaT9wjKHr8RbDVddVHyTfAAsrekwKmP1"
+                         crossorigin="anonymous">
+                        <title>Пример загрузки файла</title>
+                        <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" 
+                        integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" 
+                        crossorigin="anonymous"></script>
+                        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" 
+                        integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" 
+                        crossorigin="anonymous"></script>
+                        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" 
+                        integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" 
+                        crossorigin="anonymous"></script>
+                      </head>
+                    <body>
+                    
+                        <form method="POST" action="" enctype="multipart/form-data">
+                        <div class="form-group">
+                            <input type="file" name="photo" class="form-control-file">
+                        </div>
+                        {photo}
+                        <button type="submit" class="btn btn-primary">Upload</button>
+                    </form>
+                    
                     </body>
                     </html>"""
 
